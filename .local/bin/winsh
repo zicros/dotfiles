@@ -1,0 +1,21 @@
+#!/usr/bin/bash
+SCRIPT_NAME=${0##*/}
+
+SHELLS=( "pwsh.exe" "powershell.exe" )
+for SHELL in "${SHELLS[@]}"; do
+    if which $SHELL 2>&1 > /dev/null; then
+        EXE=$SHELL
+        break
+    fi
+done
+
+if [[ $TMUX && $# == 0 ]]; then
+    TMUX_TARGET=$(tmux display-message -p "#S:#{window_id}")
+    tmux rename-window -t $TMUX_TARGET $SCRIPT_NAME
+fi
+
+if [[ $# == 0 ]]; then
+    $EXE -NoExit -Command "cd"
+else
+    $EXE "$@"
+fi

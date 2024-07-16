@@ -1,0 +1,8 @@
+#!/usr/bin/bash
+
+GITHUB_REPO=$1
+APP_PACKAGE=$2
+
+PACKAGE_INFO=$(curl -s "https://api.github.com/repos/${GITHUB_REPO}/releases/latest" | jq ".assets[] | select(.name | test(\"$APP_PACKAGE\"))")
+echo $PACKAGE_INFO
+

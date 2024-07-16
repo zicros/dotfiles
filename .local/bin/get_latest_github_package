@@ -1,0 +1,20 @@
+#!/usr/bin/bash
+
+if [[ $# -eq 2 ]]; then
+    PACKAGE_INFO_FILE=$1
+    DEST=$2
+    PACKAGE_INFO=$(cat ${PACKAGE_INFO_FILE})
+elif [[ $# -eq 3 ]]; then
+    GITHUB_REPO=$1
+    APP_PACKAGE=$2
+    DEST=$3
+    PACKAGE_INFO=$(get_latest_github_package_info ${GITHUB_REPO} ${APP_PACKAGE})
+fi
+
+PACKAGE_FILENAME=$(echo $PACKAGE_INFO | jq ".name" | sed 's/"//g')
+DOWNLOAD_URL=$(echo $PACKAGE_INFO | jq ".browser_download_url" | sed 's/"//g')
+
+DEST_PATH="$DEST/${PACKAGE_FILENAME}"
+curl -s -L -o "$DEST_PATH" ${DOWNLOAD_URL}
+
+echo $DEST_PATH

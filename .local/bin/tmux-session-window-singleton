@@ -1,0 +1,92 @@
+#!/usr/bin/python3
+import sys
+import subprocess
+
+def find_desired_target_window(panes, desired_panes):
+    for pane in panes:
+        pane_target_parts = pane.split(':')
+        pane_name = pane_target_parts[-1]
+        for desired_pane in desired_panes:
+            if desired_pane in pane_name:
+                return '{0}:{1}'.format(*pane_target_parts[0:2])
+
+    return None
+
+def get_panes(target):
+    proc = subprocess.run('tmux list-panes -a -F "#S:#{window_id}:#{window_name}:#{pane_start_command}"', shell=True, capture_output=True)
+
+    panes = {}
+    for pane in proc.stdout.decode("utf-8").split('\n'):
+        if not pane.startswith('{0}'.format(target)):
+            continue
+
+        pane_name = pane.split(':')[-1]
+        if pane_name in panes:
+            panes[pane_name] += [pane]
+        else:
+            panes[pane_name] = [pane]
+
+    return panes
+
+# Find any missing panes, allowing for duplicates
+def get_missing_panes(desired_panes, panes):
+    nonexistent_panes = []
+    for desired_pane in desired_panes:
+        if desired_pane not in panes:
+            nonexistent_panes += [desired_pane]
+        elif len(panes[desired_pane]) > 1:
+            panes[desired_pane].pop()
+        else:
+            panes.pop(desired_pane)
+
+    return nonexistent_panes
+
+def run():
+    if len(sys.argv) < 2:
+        print("{0} <session name> <pane name> [pane name] ...".format(sys.argv[0]))
+        raise Exception("Invalid command")
+
+    session_name = sys.argv[1]
+    desired_panes = sys.argv[2:]
+
+    target_window = None
+
+    proc = subprocess.run('tmux has-session -t {0}'.format(session_name), shell=True, capture_output=True)
+    if proc.returncode == 1:
+        print("Creating new session: {0}".format(session_name))
+        proc = subprocess.run('tmux new-session -ds {0} -PF "#S:#{{window_id}}" {1}'.format(session_name, desired_panes[0]), shell=True, capture_output=True)
+
+        target_window = proc.stdout.decode("utf-8")[:-1]
+
+    if not target_window:
+        # Enumerate windows after creating the session to ensure we catch the new window name
+        # We are using `-a` to get all panes in all windows in the session
+        proc = subprocess.run('tmux list-panes -a -F "#S:#{window_id}:#{window_name}:#{pane_start_command}"', shell=True, capture_output=True)
+
+        panes = [pane for pane in proc.stdout.decode("utf-8").split('\n') if pane.startswith('{0}:'.format(session_name))]
+
+        target_window = find_desired_target_window(panes, desired_panes)
+
+    if not target_window:
+        print("Creating new window for session: {0}".format(session_name))
+
+        # Still haven't found a window to use, so create a new window and use that
+        proc = subprocess.run('tmux new-window -t "{0}:" -PF "#S:#{{window_id}}:#{{pane_start_command}}" {1}'.format(session_name, desired_panes[0]), shell=True, capture_output=True)
+
+        target_window = '{0}:{1}'.format(*proc.stdout.decode("utf-8").split(":")[0:2])
+
+    panes = get_panes(target_window if target_window else session_name)
+
+    #print("Will use target window: ", target_window)
+    #print("Desired panes: ", desired_panes)
+    #print("Found panes: ", panes)
+
+    nonexistent_panes = get_missing_panes(desired_panes, panes)
+    #print("Remaining panes: ", nonexistent_panes)
+
+    for pane_cmd in nonexistent_panes:
+        print("Splitting window with cmd: (0)".format(pane_cmd))
+        proc = subprocess.run('tmux split-window -t "{0}" -PF "#S:#{{window_id}}" {1}'.format(target_window, pane_cmd), shell=True, capture_output=True)
+
+if __name__ == "__main__":
+    run()

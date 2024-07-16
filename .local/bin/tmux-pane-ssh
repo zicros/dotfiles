@@ -1,0 +1,10 @@
+#!/usr/bin/bash
+TMUX_TARGET=$(tmux display-message -p "#S:#{window_id}")".${TMUX_PANE}"
+DEV_HOST=${1}
+
+shift
+
+# SSH will always change the title, so we set the format to include the expected string.
+tmux set-option -t ${TMUX_TARGET} pane-border-format '#{pane_index} #{pane_start_command}'
+
+tmux split-window -t ${TMUX_TARGET} -PF "#S:#{window_id}" ssh "${DEV_HOST}" "$@"

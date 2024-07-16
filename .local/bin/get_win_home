@@ -1,0 +1,8 @@
+#!/usr/bin/bash
+
+# CMD.exe can will spit out errors about not recognizing the current path if in linux path. We'll
+# ignore those errors and assume the command succeeds.
+# There's no reason to expect the command to fail because it's just printing an environment variable
+# that's known to exist.
+echo $(cmd.exe /c echo %USERPROFILE% 2>/dev/null \
+    | awk -F'[:\\\\\\r]' -vOFS='/' '{printf "/mnt/%s",tolower($1); $1=$2=""; print $0}')

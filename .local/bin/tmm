@@ -1,0 +1,10 @@
+#!/usr/bin/bash
+SSH_CMD="tmux-pane-ssh"
+SSH_TARGETS=( "$@" )
+CMD_TARGET=( )
+for TARGET in "${SSH_TARGETS[@]}"; do
+    CMD_TARGET+=("$SSH_CMD $TARGET")
+done
+
+CURRENT_TMUX_SESSION=$(tmux display-message -p "#S")
+tmux-session-window-singleton $CURRENT_TMUX_SESSION "${CMD_TARGET[@]}"
