@@ -1,0 +1,29 @@
+#!/usr/bin/bash
+
+usage() {
+    echo "Usage: ${0%*/} [-l] [-w] -p <path to convert>"
+    echo "  -l : Convert to linux path"
+    echo "  -w : Convert to windows path"
+    exit 1
+}
+
+while getopts lwp: flag
+do
+    case "${flag}" in
+        l) TO_LINUX=1;;
+        w) TO_WINDOWS=1;;
+        p) PATH_TO_CONVERT=${OPTARG};;
+        *) usage;;
+    esac
+done
+
+if ! [[ -z $TO_LINUX ]]; then
+    exit 0
+fi
+
+if ! [[ -z $TO_WINDOWS ]]; then
+    echo $PATH_TO_CONVERT | sed -s 's|/mnt/\([a-zA-Z]\)/|\1:/|'
+    exit 0
+fi
+
+usage
