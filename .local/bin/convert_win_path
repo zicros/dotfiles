@@ -1,2 +1,0 @@
-#!/usr/bin/bash
-cat | sed 's/\(\w\):/\/mnt\/\L\1/' | sed 's/\\/\//g'
