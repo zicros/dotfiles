@@ -18,11 +18,12 @@ do
 done
 
 if ! [[ -z $TO_LINUX ]]; then
+    echo $PATH_TO_CONVERT | sed -s 's|^\([a-zA-Z]\):\\|/mnt/\l\1/|' | sed -s 's|\\|/|g'
     exit 0
 fi
 
 if ! [[ -z $TO_WINDOWS ]]; then
-    echo $PATH_TO_CONVERT | sed -s 's|/mnt/\([a-zA-Z]\)/|\1:/|'
+    echo $PATH_TO_CONVERT | sed -s 's|^/mnt/\([a-zA-Z]\)/|\1:/|'
     exit 0
 fi
 
