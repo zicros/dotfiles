@@ -1,15 +1,26 @@
 #!/usr/bin/bash
 
-if [[ $# -eq 2 ]]; then
-    PACKAGE_INFO_FILE=$1
-    DEST=$2
-    PACKAGE_INFO=$(cat ${PACKAGE_INFO_FILE})
-elif [[ $# -eq 3 ]]; then
-    GITHUB_REPO=$1
-    APP_PACKAGE=$2
-    DEST=$3
-    PACKAGE_INFO=$(get_latest_github_package_info ${GITHUB_REPO} ${APP_PACKAGE})
+usage() {
+    >&2 echo "Usage: ${0##*/} -r <GITHUB REPO> -p <PACKAGE NAME> -d <DESTINATION>"
+    exit 1
+}
+
+while getopts d:p:r: flag
+do
+    case "${flag}" in
+        p) APP_PACKAGE=${OPTARG};;
+        r) GITHUB_REPO=${OPTARG};;
+        d) DEST=${OPTARG};;
+        *) usage;;
+    esac
+done
+
+if [[ -z $APP_PACKAGE ]] || [[ -z $GITHUB_REPO ]] || [[ -z $DEST ]] then
+    usage
+    exit 1
 fi
+
+PACKAGE_INFO=$(get_latest_github_package_info -r ${GITHUB_REPO} -p ${APP_PACKAGE})
 
 PACKAGE_FILENAME=$(echo $PACKAGE_INFO | jq ".name" | sed 's/"//g')
 DOWNLOAD_URL=$(echo $PACKAGE_INFO | jq ".browser_download_url" | sed 's/"//g')

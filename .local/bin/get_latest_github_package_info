@@ -1,8 +1,26 @@
 #!/usr/bin/bash
 
-GITHUB_REPO=$1
-APP_PACKAGE=$2
+usage() {
+    >&2 echo "Usage: ${0##*/} -r <GITHUB REPO> -p <PACKAGE NAME>"
+    exit 1
+}
 
-PACKAGE_INFO=$(curl -s "https://api.github.com/repos/${GITHUB_REPO}/releases/latest" | jq ".assets[] | select(.name | test(\"$APP_PACKAGE\"))")
+while getopts p:r: flag
+do
+    case "${flag}" in
+        p) APP_PACKAGE=${OPTARG};;
+        r) GITHUB_REPO=${OPTARG};;
+        *) usage;;
+    esac
+done
+
+if [[ -z $APP_PACKAGE ]] || [[ -z $GITHUB_REPO ]] then
+    usage
+    exit 1
+fi
+
+PACKAGE_INFO=$(curl -s "https://api.github.com/repos/${GITHUB_REPO}/releases/latest" | \
+    jq ".assets[] | select(.name | test(\"$APP_PACKAGE\"))"\
+)
 echo $PACKAGE_INFO
 
