@@ -1,12 +1,4 @@
 #!/usr/bin/bash
 PROFILE_NAME=${1}
-CMD="/usr/bin/zsh -c \"source $HOME/.config/tmux/profiles/${PROFILE_NAME}\""
-tmux has-session -t "$PROFILE_NAME"
-
-if [[ $? != 0 ]]; then
-    TMUX_TARGET=$(tmux new-session -PF "#S:#{window_id}" -ds $PROFILE_NAME "$CMD")
-else
-    TMUX_TARGET=$(tmux new-window -t $PROFILE_NAME -PF "#S:#{window_id}" "$CMD")
-fi
-
-tmux switch-client -t "$TMUX_TARGET"
+/usr/bin/bash "$HOME/.config/tmux/profiles/${PROFILE_NAME}"
+exit 0
