@@ -13,6 +13,9 @@ def get_missing_panes(desired_panes, window):
         else:
             panes[pane.get_start_command()] = [pane]
 
+    print("Desired panes with command:", desired_panes)
+    print("Found panes with command:", [cmd for cmd in panes])
+
     nonexistent_panes = []
     for desired_pane in desired_panes:
         if desired_pane not in panes:
