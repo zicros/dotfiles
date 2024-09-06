@@ -31,5 +31,6 @@ config restore --staged $HOME && config restore $HOME
 sh <(curl -L https://nixos.org/nix/install) --no-daemon
 
 # Install home-manager and switch
-nix run home-manager/master -- init --switch
+nix run home-manager/master --extra-experimental-features "nix-command flakes" -- init --switch
+--impure
 ```
