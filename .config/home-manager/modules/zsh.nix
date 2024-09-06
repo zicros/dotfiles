@@ -11,7 +11,6 @@ in
       ".zshrc" = {
         text = ''
           # This is a generated file. DO NOT MODIFY.
-          source "${config.rz.base.path}/.zshrc"
 
           # Only add to path if it's not in the path already.
           # https://unix.stackexchange.com/questions/124444/how-can-i-cleanly-add-to-path
@@ -29,6 +28,9 @@ in
           if [ -e "${config.home.homeDirectory}/.nix-profile/etc/profile.d/nix.sh" ]; then
             . "${config.home.homeDirectory}/.nix-profile/etc/profile.d/nix.sh";
           fi
+
+          # Make sure we have the PATH populated before sourcing the real ZSHRC.
+          source "${config.rz.base.path}/.zshrc"
         '';
         #source = config.lib.file.mkOutOfStoreSymlink "${config.rz.base.path}/.dotfiles/base/.zshrc";
       };
