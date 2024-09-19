@@ -9,18 +9,22 @@
       url = "github:nix-community/home-manager";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    rzneovim = {
+        url = "git+ssh://git@github.com/zicros/nvim";
+        flake = false;
+    };
   };
 
-  outputs = { nixpkgs, home-manager, ... }:
+  outputs = { self, nixpkgs, home-manager, ... }:
     let
       system = "x86_64-linux";
       pkgs = nixpkgs.legacyPackages.${system};
     in {
       defaultPackage.${system} = home-manager.defaultPackage.${system};
 
-      lib = import ./lib.nix {
+      lib = import ./.config/home-manager/lib.nix {
         inherit pkgs;
-        inherit home-manager;
+        inherit self;
       };
     };
 }

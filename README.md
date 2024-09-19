@@ -53,37 +53,24 @@ A basic `flake.nix` file looks like:
       defaultPackage.${system} = rzbase.defaultPackage.${system};
 
       homeConfigurations.${user} = rzbase.lib.mkHomeConfiguration {
+        inherit user;
+        homeDirectory = homePath;
+
         # Specify your home configuration modules here, for example,
         # the path to your home.nix.
         modules = [ ./home.nix ];
-
-        extraSpecialArgs = {
-          user = user;
-          homePath = homePath;
-          baseDep = rzbase;
-        };
       };
     };
 }
 ```
 
+`home.nix`
+
 ```nix
-{ config, pkgs, user, homePath, baseDep, ... }:
+{ config, pkgs, ... }:
 let
-  baseDotFilesPath = "${baseDep.outPath}";
 in
 {
-  home.username = user;
-  home.homeDirectory = homePath;
-  home.stateVersion = "24.05";
-
-  imports = [
-    "${baseDotFilesPath}/.config/home-manager/modules"
-  ];
-
-  # This doesn't seem to work, but leaving in here for future reference.
-  # home.sessionPath = [];
-
   # Installs to the user profile.
   # Generally prefer distro specific packages over these for security reasons, but
   # nix can have more up-to-date packages or even more packages.
@@ -91,14 +78,15 @@ in
   ];
 
   rz.base = {
-    enable = true;
-    path = baseDotFilesPath;
     zsh.enable = true;
     tmux.enable = true;
     topydo.enable = true;
   };
 
-  # Let Home Manager install and manage itself.
-  programs.home-manager.enable = true;
+  rz.neovim = {
+    enable = true;
+  };
 }
+
+# vim:ts=2:sw=2:expandtab:
 ```
