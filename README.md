@@ -31,6 +31,74 @@ config restore --staged $HOME && config restore $HOME
 sh <(curl -L https://nixos.org/nix/install) --no-daemon
 
 # Install home-manager and switch
-nix run home-manager/master --extra-experimental-features "nix-command flakes" -- init --switch
---impure
+nix run . -- init --switch --impure
+```
+
+A basic `flake.nix` file looks like:
+
+```nix
+{
+  description = "Home Manager configuration of robert";
+
+  inputs = {
+    rzbase.url = "github:zicros/dotfiles/main";
+  };
+
+  outputs = { rzbase, ... }:
+    let
+      system = "x86_64-linux";
+      user = "robert";
+      homePath = "/home/${user}";
+    in {
+      defaultPackage.${system} = rzbase.defaultPackage.${system};
+
+      homeConfigurations.${user} = rzbase.lib.mkHomeConfiguration {
+        # Specify your home configuration modules here, for example,
+        # the path to your home.nix.
+        modules = [ ./home.nix ];
+
+        extraSpecialArgs = {
+          user = user;
+          homePath = homePath;
+          baseDep = rzbase;
+        };
+      };
+    };
+}
+```
+
+```nix
+{ config, pkgs, user, homePath, baseDep, ... }:
+let
+  baseDotFilesPath = "${baseDep.outPath}";
+in
+{
+  home.username = user;
+  home.homeDirectory = homePath;
+  home.stateVersion = "24.05";
+
+  imports = [
+    "${baseDotFilesPath}/.config/home-manager/modules"
+  ];
+
+  # This doesn't seem to work, but leaving in here for future reference.
+  # home.sessionPath = [];
+
+  # Installs to the user profile.
+  # Generally prefer distro specific packages over these for security reasons, but
+  # nix can have more up-to-date packages or even more packages.
+  home.packages = with pkgs; [
+  ];
+
+  rz.base = {
+    enable = true;
+    path = baseDotFilesPath;
+    zsh.enable = true;
+    tmux.enable = true;
+    topydo.enable = true;
+  };
+
+  # Let Home Manager install and manage itself.
+  programs.home-manager.enable = true;
+}
 ```
