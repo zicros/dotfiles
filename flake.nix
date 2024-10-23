@@ -14,9 +14,8 @@
     };
   };
 
-  outputs = { self, nixpkgs, home-manager, ... }:
+  outputs = { self, pkgs, home-manager, ... }:
     let
-      pkgs = nixpkgs.legacyPackages.${system};
     in {
       defaultPackage.x86_64-linux = home-manager.defaultPackage.x86_64-linux;
       defaultPackage.aarch64-linux = home-manager.defaultPackage.aarch64-linux;
