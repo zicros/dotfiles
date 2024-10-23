@@ -31,7 +31,21 @@ config restore --staged $HOME && config restore $HOME
 sh <(curl -L https://nixos.org/nix/install) --no-daemon
 
 # Install home-manager and switch
-nix run . -- init --switch --impure
+# There may be some errors, but it should switch.
+nix \
+  --extra-experimental-features nix-command \
+  --extra-experimental-features flakes \
+  run $HOME/.config/home-manager -- \
+  --extra-experimental-features nix-command \
+  --extra-experimental-features flakes \
+  init \
+  switch
+```
+
+Future runs can just be:
+
+```
+nix run $HOME/.config/home-manager -- switch
 ```
 
 A basic `flake.nix` file looks like:
