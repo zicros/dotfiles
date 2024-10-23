@@ -41,20 +41,26 @@ A basic `flake.nix` file looks like:
   description = "Home Manager configuration of robert";
 
   inputs = {
-    rzbase.url = "github:zicros/dotfiles/main";
+    nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
+    rzbase = {
+        url = "github:zicros/dotfiles/main";
+        inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
-  outputs = { rzbase, ... }:
+  outputs = { nixpkgs, rzbase, ... }:
     let
-      system = "x86_64-linux";
       user = "robert";
-      homePath = "/home/${user}";
+      homeDirectory = "/home/${user}";
+      pkgs = nixpkgs.legacyPackages.x86_64-linux;
     in {
-      defaultPackage.${system} = rzbase.defaultPackage.${system};
+      defaultPackage.x86_64-linux = rzbase.defaultPackage.x86_64-linux;
+      defaultPackage.aarch64-linux = rzbase.defaultPackage.aarch64-linux;
 
       homeConfigurations.${user} = rzbase.lib.mkHomeConfiguration {
+        inherit pkgs;
         inherit user;
-        homeDirectory = homePath;
+        inherit homeDirectory;
 
         # Specify your home configuration modules here, for example,
         # the path to your home.nix.
