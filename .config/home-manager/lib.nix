@@ -1,5 +1,4 @@
 {
-  pkgs,
   self
 }:
 let
@@ -8,7 +7,6 @@ let
       base = self;
     in
       base.inputs.home-manager.lib.homeManagerConfiguration {
-        inherit pkgs;
         extraSpecialArgs = {
           inherit user;
           inherit homeDirectory;
