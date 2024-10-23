@@ -4,6 +4,7 @@
 
   inputs = {
     # Caller specifies the nixpkgs to use so they can provide the right packages matching architecture.
+    nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
     home-manager = {
       url = "github:nix-community/home-manager";
       inputs.nixpkgs.follows = "nixpkgs";
