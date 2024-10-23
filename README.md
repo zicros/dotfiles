@@ -64,22 +64,32 @@ A basic `flake.nix` file looks like:
     let
       user = "robert";
       homeDirectory = "/home/${user}";
-      pkgs = nixpkgs.legacyPackages.x86_64-linux;
+
+      homeConfig = { pkgs }:
+        rzbase.lib.mkHomeConfiguration {
+            inherit pkgs;
+            inherit user;
+            inherit homeDirectory;
+
+            # Specify your home configuration modules here, for example,
+            # the path to your home.nix.
+            modules = [ ./home.nix ];
+        };
     in {
       defaultPackage.x86_64-linux = rzbase.defaultPackage.x86_64-linux;
       defaultPackage.aarch64-linux = rzbase.defaultPackage.aarch64-linux;
 
-      homeConfigurations.${user} = rzbase.lib.mkHomeConfiguration {
-        inherit pkgs;
-        inherit user;
-        inherit homeDirectory;
-
-        # Specify your home configuration modules here, for example,
-        # the path to your home.nix.
-        modules = [ ./home.nix ];
+      packages = {
+        aarch64-linux.homeConfigurations.${user} = homeConfig {
+            pkgs = nixpkgs.legacyPackages.aarch64-linux;
+        };
+        x86_64-linux.homeConfigurations.${user} = homeConfig {
+            pkgs = nixpkgs.legacyPackages.x86_64-linux;
+        };
       };
     };
 }
+
 ```
 
 `home.nix`
