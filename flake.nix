@@ -15,7 +15,7 @@
     };
   };
 
-  outputs = { self, home-manager, ... }:
+  outputs = { self, pkgs, home-manager, ... }:
     let
     in {
       defaultPackage.x86_64-linux = home-manager.defaultPackage.x86_64-linux;
