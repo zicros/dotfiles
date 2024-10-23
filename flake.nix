@@ -20,7 +20,8 @@
       system = "x86_64-linux";
       pkgs = nixpkgs.legacyPackages.${system};
     in {
-      defaultPackage.${system} = home-manager.defaultPackage.${system};
+      defaultPackage.x86_64-linux = home-manager.defaultPackage.x86_64-linux;
+      defaultPackage.aarch64-linux = home-manager.defaultPackage.aarch64-linux;
 
       lib = import ./.config/home-manager/lib.nix {
         inherit pkgs;
