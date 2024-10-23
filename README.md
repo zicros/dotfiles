@@ -33,11 +33,9 @@ sh <(curl -L https://nixos.org/nix/install) --no-daemon
 # Install home-manager and switch
 # There may be some errors, but it should switch.
 nix \
-  --extra-experimental-features nix-command \
-  --extra-experimental-features flakes \
+  --extra-experimental-features "nix-command flakes" \
   run $HOME/.config/home-manager -- \
-  --extra-experimental-features nix-command \
-  --extra-experimental-features flakes \
+  --extra-experimental-features "nix-command flakes" \
   init \
   switch
 ```
