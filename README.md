@@ -31,7 +31,19 @@ config restore --staged $HOME && config restore $HOME
 sh <(curl -L https://nixos.org/nix/install) --no-daemon
 
 # Install home-manager and switch
-nix run . -- init --switch --impure
+# There may be some errors, but it should switch.
+nix \
+  --extra-experimental-features "nix-command flakes" \
+  run $HOME/.config/home-manager -- \
+  --extra-experimental-features "nix-command flakes" \
+  init \
+  switch
+```
+
+Future runs can just be:
+
+```
+nix run $HOME/.config/home-manager -- switch
 ```
 
 A basic `flake.nix` file looks like:
@@ -41,27 +53,43 @@ A basic `flake.nix` file looks like:
   description = "Home Manager configuration of robert";
 
   inputs = {
-    rzbase.url = "github:zicros/dotfiles/main";
+    nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
+    rzbase = {
+        url = "github:zicros/dotfiles/main";
+        inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
-  outputs = { rzbase, ... }:
+  outputs = { nixpkgs, rzbase, ... }:
     let
-      system = "x86_64-linux";
       user = "robert";
-      homePath = "/home/${user}";
+      homeDirectory = "/home/${user}";
+
+      homeConfig = { pkgs }:
+        rzbase.lib.mkHomeConfiguration {
+            inherit pkgs;
+            inherit user;
+            inherit homeDirectory;
+
+            # Specify your home configuration modules here, for example,
+            # the path to your home.nix.
+            modules = [ ./home.nix ];
+        };
     in {
-      defaultPackage.${system} = rzbase.defaultPackage.${system};
+      defaultPackage.x86_64-linux = rzbase.defaultPackage.x86_64-linux;
+      defaultPackage.aarch64-linux = rzbase.defaultPackage.aarch64-linux;
 
-      homeConfigurations.${user} = rzbase.lib.mkHomeConfiguration {
-        inherit user;
-        homeDirectory = homePath;
-
-        # Specify your home configuration modules here, for example,
-        # the path to your home.nix.
-        modules = [ ./home.nix ];
+      packages = {
+        aarch64-linux.homeConfigurations.${user} = homeConfig {
+            pkgs = nixpkgs.legacyPackages.aarch64-linux;
+        };
+        x86_64-linux.homeConfigurations.${user} = homeConfig {
+            pkgs = nixpkgs.legacyPackages.x86_64-linux;
+        };
       };
     };
 }
+
 ```
 
 `home.nix`

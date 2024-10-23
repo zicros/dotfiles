@@ -3,7 +3,7 @@
   description = "Home Manager configuration of robert";
 
   inputs = {
-    # Specify the source of Home Manager and Nixpkgs.
+    # Caller specifies the nixpkgs to use so they can provide the right packages matching architecture.
     nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
     home-manager = {
       url = "github:nix-community/home-manager";
@@ -15,15 +15,13 @@
     };
   };
 
-  outputs = { self, nixpkgs, home-manager, ... }:
+  outputs = { self, home-manager, ... }:
     let
-      system = "x86_64-linux";
-      pkgs = nixpkgs.legacyPackages.${system};
     in {
-      defaultPackage.${system} = home-manager.defaultPackage.${system};
+      defaultPackage.x86_64-linux = home-manager.defaultPackage.x86_64-linux;
+      defaultPackage.aarch64-linux = home-manager.defaultPackage.aarch64-linux;
 
       lib = import ./.config/home-manager/lib.nix {
-        inherit pkgs;
         inherit self;
       };
     };
