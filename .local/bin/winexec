@@ -1,0 +1,7 @@
+#!/usr/bin/bash
+# We are using the <<< redirect, so this needs bash
+
+# Not sure if this is necessary, but the option to convert to base64 encoded command is there.
+# Since I figured it out once, I'll document it here in case it's needed:
+# ENCODED_COMMAND=$(iconv -f UTF8 -t UTF16LE <<< "$@" | base64 -)
+winsh -NonInteractive -NoLogo -NoProfile -Command "& {$@}"
