@@ -1,0 +1,51 @@
+#!/usr/bin/python3
+import sys
+import subprocess
+import os
+
+def print_usage():
+    print("Usage:", os.path.basename(sys.argv[0]), "<search path>", "<regex>")
+
+def prompt_desired_code_file(path, regex, delimeter):
+    rg_proc = subprocess.Popen((
+        'rg', '--no-heading', '--line-number', '--with-filename', '--color=always', '--smart-case',
+        '--field-match-separator', delimeter,
+        regex, path),
+        stdout=subprocess.PIPE)
+
+    fzf_proc = subprocess.run((
+        'fzf', '-0', '--delimiter', delimeter, '--ansi', '--info=inline', '--tac',
+        '--preview', 'batcat --color=always --style=plain --paging=never --highlight-line {2} {1}',
+        '--preview-window=+{2}/2,border-left'),
+        stdin=rg_proc.stdout,
+        stdout=subprocess.PIPE)
+
+    if fzf_proc.returncode != 0:
+        return
+
+    file_path, line_number, _= fzf_proc.stdout.decode('utf8').split(delimeter)
+    return file_path, line_number
+
+def search_code(path, regex, editor=None, delimeter='\u00a0'):
+    desired_file_details = prompt_desired_code_file(path=path, regex=regex, delimeter=delimeter)
+    if desired_file_details is None:
+        return
+
+    editor = os.environ['EDITOR']
+    if editor is None:
+        return
+
+    file_path, line_number = desired_file_details
+
+    if editor == '/usr/bin/nvim':
+        subprocess.run((editor, f'+{line_number}', file_path))
+    else:
+        # Unknown editor, so just open the file
+        subprocess.run((editor, file_path))
+
+if __name__ == "__main__":
+    if len(sys.argv) != 3:
+        print_usage()
+        sys.exit(1)
+
+    search_code(sys.argv[1], sys.argv[2])
