@@ -60,45 +60,56 @@ A basic `flake.nix` file looks like:
     };
   };
 
-  outputs = { nixpkgs, rzbase, ... }:
+  outputs = { nixpkgs, home-manager, ... } @ inputs:
     let
       user = "robert";
-      homeDirectory = "/home/${user}";
 
-      homeConfig = { pkgs }:
-        rzbase.lib.mkHomeConfiguration {
-            inherit pkgs;
+      mkHomeConfig = { pkgs }:
+        home-manager.lib.homeManagerConfiguration {
+          inherit pkgs;
+
+          extraSpecialArgs = {
+            inherit inputs;
             inherit user;
-            inherit homeDirectory;
+          };
 
-            # Specify your home configuration modules here, for example,
-            # the path to your home.nix.
-            modules = [ ./home.nix ];
+          modules = [ ./home.nix ];
         };
+
     in {
-      defaultPackage.x86_64-linux = rzbase.defaultPackage.x86_64-linux;
-      defaultPackage.aarch64-linux = rzbase.defaultPackage.aarch64-linux;
+      defaultPackage.x86_64-linux = home-manager.defaultPackage.x86_64-linux;
+      defaultPackage.aarch64-linux = home-manager.defaultPackage.aarch64-linux;
 
       packages = {
-        aarch64-linux.homeConfigurations.${user} = homeConfig {
+        aarch64-linux.homeConfigurations.${user} = mkHomeConfig {
             pkgs = nixpkgs.legacyPackages.aarch64-linux;
         };
-        x86_64-linux.homeConfigurations.${user} = homeConfig {
+        x86_64-linux.homeConfigurations.${user} = mkHomeConfig {
             pkgs = nixpkgs.legacyPackages.x86_64-linux;
         };
       };
     };
 }
-
 ```
 
 `home.nix`
 
 ```nix
-{ config, pkgs, ... }:
+{ inputs, user, config, pkgs, ... }:
 let
+  baseDotFilesPath = inputs.rzbase.outPath;
 in
 {
+  imports = [
+    "${baseDotFilesPath}/.config/home-manager/modules"
+  ];
+
+  home.username = user;
+  home.homeDirectory = "/home/${user}";
+  home.stateVersion = "24.05";
+
+  programs.home-manager.enable = true;
+
   # Installs to the user profile.
   # Generally prefer distro specific packages over these for security reasons, but
   # nix can have more up-to-date packages or even more packages.
@@ -106,9 +117,9 @@ in
   ];
 
   rz.base = {
+    enable = true;
     zsh.enable = true;
     tmux.enable = true;
-    topydo.enable = true;
   };
 
   rz.neovim = {
