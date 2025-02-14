@@ -1,13 +1,14 @@
-{ config, lib, pkgs, ... }:
+{ config, lib, pkgs, inputs, ... }:
 let
+  neovimConfigPath = inputs.rzbase.inputs.rzneovim.outPath;
   cfg = config.rz.neovim;
 in
 {
   options.rz.neovim = with lib; {
     enable = mkEnableOption "neovim";
     path = mkOption {
-      type = types.nullOr types.str;
-      default = null;
+      type = types.str;
+      default = neovimConfigPath;
       description = ''
         The path to the neovim config directory.
       '';

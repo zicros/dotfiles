@@ -17,10 +17,6 @@ in
     path = baseDotFilesPath;
   };
 
-  rz.neovim = {
-    path = neovimSourcePath;
-  };
-
   # Let Home Manager install and manage itself.
   programs.home-manager.enable = true;
 }

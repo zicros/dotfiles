@@ -1,12 +1,14 @@
-{ config, lib, pkgs, ... }:
-let cfg = config.rz.base;
+{ config, lib, pkgs, inputs, ... }:
+let
+  basePath = inputs.rzbase.outPath;
+  cfg = config.rz.base;
 in
 {
   options.rz.base = with lib; {
     enable = mkEnableOption "base";
     path = mkOption {
-      type = types.nullOr types.str;
-      default = null;
+      type = types.str;
+      default = basePath ;
       example = "$HOME/.dotfiles/base";
       description = ''
         The path to the base dotfiles.
@@ -22,3 +24,5 @@ in
     };
   };
 }
+
+# vim:ts=2:sw=2:expandtab:
