@@ -1,3 +1,10 @@
+# Bootstrap OS
+
+## Windows
+```powershell
+Invoke-Command -ScriptBlock ([ScriptBlock]::Create((Invoke-WebRequest https://raw.githubusercontent.com/zicros/dotfiles/refs/heads/main/.local/lib/bootstrap/setup.ps1).Content))
+```
+
 # Setup
 Generally speaking, to bootstrap:
 
