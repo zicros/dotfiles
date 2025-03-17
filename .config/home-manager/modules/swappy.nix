@@ -1,5 +1,5 @@
 { config, lib, pkgs, ... }:
-let cfg = config.rz.base.topydo;
+let cfg = config.rz.base.swappy;
 in
 {
   options.rz.base.swappy = with lib; {
