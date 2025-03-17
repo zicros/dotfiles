@@ -5,6 +5,7 @@
     ./zsh.nix
     ./tmux.nix
     ./topydo.nix
+    ./swappy.nix
     ./neovim.nix
   ];
 }
