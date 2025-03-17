@@ -23,6 +23,12 @@ if [ -d "$HOME/.local/bin" ] ; then
     add_to_path "$HOME/.local/bin"
 fi
 
+# Wayland
+if [ -z "$WAYLAND_DISPLAY" ] && [ -n "$XDG_VTNR" ] && [ "$XDG_VTNR" -eq 1 ] ; then
+    exec sway
+fi
+
+# X
 if [ -z "${DISPLAY}" ] && [ "${XDG_VTNR}" -eq "1" ]; then
     echo "Starting display ${DISPLAY}, XDG_VTNR ${XDG_VTNR}"
     exec startx
