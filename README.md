@@ -84,15 +84,16 @@ A basic `flake.nix` file looks like:
         };
 
     in {
-      defaultPackage.x86_64-linux = home-manager.defaultPackage.x86_64-linux;
-      defaultPackage.aarch64-linux = home-manager.defaultPackage.aarch64-linux;
-
       packages = {
         aarch64-linux.homeConfigurations.${user} = mkHomeConfig {
+            default = home-manager.packages.aarch64-linux.default;
             pkgs = nixpkgs.legacyPackages.aarch64-linux;
         };
-        x86_64-linux.homeConfigurations.${user} = mkHomeConfig {
-            pkgs = nixpkgs.legacyPackages.x86_64-linux;
+        x86_64-linux = {
+            default = home-manager.packages.x86_64-linux.default;
+            homeConfigurations.${user} = mkHomeConfig {
+                pkgs = nixpkgs.legacyPackages.x86_64-linux;
+            };
         };
       };
     };
