@@ -1,0 +1,1 @@
+ssh -G $1 | rg "^hostname" | awk '{print $2}'
