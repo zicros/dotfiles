@@ -1,6 +1,7 @@
 {
   imports = [
     ./libs
+    ./packages
     ./base.nix
     ./zsh.nix
     ./tmux.nix
