@@ -58,6 +58,9 @@ setopt share_history
 # Don't display duplicate commands
 setopt hist_find_no_dups
 
+# Allow for comments in CLI
+setopt interactivecomments
+
 setopt nomatch
 unsetopt autocd beep extendedglob
 
