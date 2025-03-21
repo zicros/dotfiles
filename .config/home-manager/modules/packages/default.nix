@@ -1,8 +1,4 @@
-{ config, pkgs, lib, ... }:
+{ pkgs }:
 {
-    nixpkgs.overlays = [
-        (final: prev: {
-            rz_fzf = pkgs.callPackage ./fzf { };
-        })
-    ];
+    fzf = import ./fzf { inherit pkgs; };
 }

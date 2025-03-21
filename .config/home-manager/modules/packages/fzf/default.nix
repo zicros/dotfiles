@@ -1,9 +1,9 @@
-{ stdenv, fetchurl, ... }:
+{ pkgs }:
 let
     bin = "fzf";
     version = "0.60.3";
 
-    uri_arch_name = if stdenv.hostPlatform.system == "aarch64-linux" then "arm64" else "amd64";
+    uri_arch_name = if pkgs.stdenv.hostPlatform.system == "aarch64-linux" then "arm64" else "amd64";
 
     target_file_name = "fzf-${version}-linux_${uri_arch_name}.tar.gz";
 
@@ -17,11 +17,11 @@ let
         arm64 = "13df4d556992938a4beb340ac3b17c51c77e46db978d3071429eb77a94c581c1";
     };
 in
-stdenv.mkDerivation {
+pkgs.stdenv.mkDerivation {
     pname = bin;
     version = version;
 
-    src = fetchurl {
+    src = pkgs.fetchurl {
         url = "https://github.com/junegunn/fzf/releases/download/v${version}/${target_file_name}";
         sha256 = pkg_checksums.${uri_arch_name};
     };

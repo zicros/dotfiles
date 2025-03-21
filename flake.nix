@@ -15,14 +15,16 @@
     };
   };
 
-  outputs = { self, home-manager, ... }:
+  outputs = { self, nixpkgs, home-manager, ... }:
     let
+      pkgs = import nixpkgs { system = "x86_64-linux"; };
     in {
       defaultPackage.x86_64-linux = home-manager.defaultPackage.x86_64-linux;
       defaultPackage.aarch64-linux = home-manager.defaultPackage.aarch64-linux;
 
       lib = import ./.config/home-manager/lib.nix {
         inherit self;
+        inherit pkgs;
       };
     };
 }
