@@ -1,3 +1,4 @@
 if [[ is_wsl ]]; then
-    export WIN_HOME=$(grep -iPo "(?<=:)/mnt/[^:]+/users/[^/]+(?=/AppData/Local/)" <<< $PATH | head -n1)
+    # Add this for easier resolving paths that need the windows path
+    export WIN_HOME=$(get_win_home)
 fi

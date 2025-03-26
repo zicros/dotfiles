@@ -4,5 +4,5 @@
 # ignore those errors and assume the command succeeds.
 # There's no reason to expect the command to fail because it's just printing an environment variable
 # that's known to exist.
-realpath $(echo $(cmd.exe /c echo %USERPROFILE% 2>/dev/null \
-    | awk -F'[:\\\\\\r]' -vOFS='/' '{printf "/mnt/%s",tolower($1); $1=$2=""; print $0}'))
+wslpath $(cmd.exe /c echo %USERPROFILE% 2>/dev/null \
+    | tr -d '\r')
