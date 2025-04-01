@@ -1,0 +1,10 @@
+# Run `swaymsg -t get_tree` to get a list of properties needed for the below to work.
+
+for_window {
+	[app_id="firefox" title="^Picture-in-Picture$"] floating enable; sticky enable
+	[app_id="firefox" title="^Extension: \(Bitwarden Password Manager\) - Bitwarden . Mozilla Firefox$"] floating enable; sticky enable
+
+    [app_id= "thunderbird-esr" title="^$"] floating enable
+}
+
+# vim:ft=swayconfig:

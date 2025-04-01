@@ -1,0 +1,5 @@
+# Application shortcuts that don't fit in other categories
+
+bindsym $mod+e exec nautilus
+
+# vim:ft=swayconfig:
