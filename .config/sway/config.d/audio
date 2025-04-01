@@ -1,0 +1,3 @@
+bindsym $mod+p exec $term --command pulsemixer
+
+# vim:ft=swayconfig:
