@@ -21,7 +21,7 @@ in
       ".config/nix/nix.conf" = {
         source = config.lib.file.mkOutOfStoreSymlink "${config.rz.base.path}/.config/nix/nix.conf";
       };
-      ".local/basebin" = {
+      ".local/lib/bin.d/base" = {
           source = config.lib.file.mkOutOfStoreSymlink "${config.rz.base.path}/.local/bin";
       };
     };
