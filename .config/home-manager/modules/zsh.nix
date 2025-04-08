@@ -21,7 +21,7 @@ in
               esac;
           }
 
-          add_to_path "${config.rz.base.path}/.local/bin"
+          add_to_path "${config.home.homeDirectory}/.local/basebin"
           add_to_path "${config.home.homeDirectory}/.local/bin"
 
           # added by Nix installer
