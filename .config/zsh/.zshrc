@@ -13,6 +13,15 @@ add_to_path() {
     esac;
 }
 
+# Add multiple bins to the path. This has lower priority than $HOME/.local/bin
+BINS_PATH="$HOME/.local/lib/bin.d/"
+if [ -d "$BINS_PATH" ]; then
+    for bin_dir in "$HOME/.local/lib/bin.d/"*/; do
+        add_to_path "$bin_dir"
+    done
+    unset bin_dir
+fi
+
 # set PATH so it includes user's private bin if it exists
 if [ -d "$HOME/.bin" ] ; then
     add_to_path "$HOME/.bin"
