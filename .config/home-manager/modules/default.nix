@@ -8,5 +8,6 @@
     ./swappy.nix
     ./sway.nix
     ./neovim.nix
+    ./os.nix
   ];
 }
