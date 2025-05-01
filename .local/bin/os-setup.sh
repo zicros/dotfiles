@@ -1,20 +1,50 @@
 #!/usr/bin/bash
 BOOTSTRAP_SCRIPTS="$HOME/.local/lib/os/setup.d"
-for file in "$BOOTSTRAP_SCRIPTS"/*; do
+
+usage()
+{
+    echo "Usage $0 [-n] [-f FILTER] "
+    exit 1
+}
+
+while getopts ":nf:" OPT; do
+    case $OPT in
+        n)
+            NOOP="1"
+            ;;
+        f)
+            FILTER=$OPTARG
+            ;;
+        :)
+            usage
+            ;;
+    esac
+done
+
+FILTER="${FILTER:-*}"
+
+for file in "$BOOTSTRAP_SCRIPTS"/$FILTER; do
     if ! [ -x "$file" ]; then
         continue
     fi
 
-    echo "Executing $file"
+    EXIT_CODE=0
+
     ENV_FILE="$file.env"
     if [ -f "$ENV_FILE" ]; then
         echo "Sourcing $ENV_FILE"
-        env $(cat $ENV_FILE | xargs) "$file"
-        EXIT_CODE=$?
-    else
-        "$file"
-        EXIT_CODE=$?
+        ENV_VARS=$(cat $ENV_FILE | xargs)
     fi
+
+    ENV_VARS="${ENV_VARS:-_NOENV=1}"
+
+    echo "Executing $file"
+    if [ "$NOOP" ]; then
+        continue
+    fi
+
+    env "${ENV_VARS}" "$file"
+    EXIT_CODE=$?
 
     if [ "$EXIT_CODE" != 0 ] ; then
         echo "Failed to setup OS"
