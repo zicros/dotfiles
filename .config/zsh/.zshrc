@@ -37,12 +37,6 @@ if [ -z "$WAYLAND_DISPLAY" ] && [ -n "$XDG_VTNR" ] && [ "$XDG_VTNR" -eq 1 ] ; th
     exec sway
 fi
 
-# X
-if [ -z "${DISPLAY}" ] && [ "${XDG_VTNR}" -eq "1" ]; then
-    echo "Starting display ${DISPLAY}, XDG_VTNR ${XDG_VTNR}"
-    exec startx
-fi
-
 if [[ -z "${ZSH_CONFIG}" ]]; then
     echo "Could not find ZSH configs, bootstrapping"
     source $HOME/.config/zsh/init/00-bootstrap.zsh
