@@ -1,0 +1,37 @@
+[alias]
+    # Need to store the output of git command before piping it to FZF
+    # https://github.com/junegunn/fzf/issues/3346
+    logp = "!COMMITS=$(git rev-list \
+            --no-commit-header \
+            --max-count=40 \
+            --color=always \
+            --format='%C(auto)%h %s %d' \
+            --first-parent HEAD); \
+        echo \"${COMMITS}\" | \
+        fzf -0 --ansi --preview='\
+            git show --stat --color=always {1}' --preview-window=50%,border-double,top | awk '{print $1}' \
+        #"
+
+    logs = log -n40 --first-parent --format='%C(auto)%h %s %C(auto)%d'
+    logsa = logs --format='%C(auto)%h %C(blue)%ae%C(auto) %s %C(auto)%d'
+    pushf = push --force-with-lease
+    branchp = "!BRANCHES=$(git branch --all --format='%(refname:short)');echo \"${BRANCHES}\" | fzf -0 --tac"
+
+    swbranch = "!f() { \
+        BRANCH=$(git branchp); \
+        if [ -z \"${BRANCH}\" ]; then \
+            return; \
+        fi; \
+        ARGS=""; \
+        if echo \"${BRANCH}\" | rg -q \"^origin/\"; then \
+            ARGS=\"${ARGS} --detach\"; \
+        fi; \
+        git switch $ARGS \"${BRANCH}\"; \
+        }; f"
+
+    addi = "!FILES=$(git ls-files --deleted --modified --exclude-standard); echo \"${FILES}\" | fzf -0 -m --preview 'git diff --color=always -- {-1}' | xargs -r git add"
+    restorei = "!FILES=$(git diff --name-only --staged); echo \"${FILES}\" | fzf -0 -m --preview 'git diff --staged --color=always -- {-1}' | xargs -r git restore --staged"
+    rebaseonto = "!BRANCH=$(git rev-parse --abbrev-ref HEAD); START_HASH=$(git logp); git rebase --interactive --onto \"$1\" $START_HASH HEAD && git switch -C \"$BRANCH\" #"
+    alias = "!git config -l | rg alias"
+
+# vim:ft=gitconfig:

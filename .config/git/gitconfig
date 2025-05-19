@@ -1,0 +1,20 @@
+# This config is meant to be included from ~/.gitconfig
+# Here's an example of how this can be done:
+#[include]
+#    path = ~/.config/git/gitconfig
+
+[core]
+    editor = nvim
+
+[include]
+    path = config.d/alias.gitconfig
+
+# WSL specific global configuration because sometimes it needs to point to the Windows side of
+# things (e.g. credential manager).
+[includeif "gitdir:/"]
+    path = ~/.config/git/config.d/wsl
+
+# Windows specific global configuration.
+[includeif "gitdir:*:/"]
+    path = ~/.config/git/config.d/windows
+
