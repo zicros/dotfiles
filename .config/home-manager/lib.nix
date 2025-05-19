@@ -1,12 +1,11 @@
 {
-  self,
-  pkgs
+  self
 }:
 let
-  customPackages = import ./modules/packages { inherit pkgs; };
 in
 {
-  packages = customPackages;
+  packages = { pkgs }:
+    import ./modules/packages { inherit pkgs; };
 }
 
 # vim:ts=2:sw=2:expandtab:
