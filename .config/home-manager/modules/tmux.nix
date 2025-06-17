@@ -11,6 +11,10 @@ in
       ".tmux.conf" = {
         source = config.lib.file.mkOutOfStoreSymlink "${config.rz.base.path}/.tmux.conf";
       };
+      ".config/tmux/config.d" = {
+        source = config.lib.file.mkOutOfStoreSymlink "${config.rz.base.path}/.config/tmux/config.d/";
+        recursive = true;
+      };
     };
   };
 }
