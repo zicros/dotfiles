@@ -40,10 +40,9 @@ class TmuxPane():
         proc = subprocess.run(
             'tmux display-message -p -t \'{0}\' -F "#{{pane_start_command}}"'.format(self.get_target()), shell=True, capture_output=True)
         out = proc.stdout.decode("utf-8").strip()
-        out_parts = out.split(':')
 
         return {
-            'start_command' : out_parts[0]
+            'start_command' : out
         }
 
     def get_start_command(self):
