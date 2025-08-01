@@ -1,0 +1,4 @@
+#!/usr/bin/bash
+# We are using the <<< redirect, so this needs bash
+ENCODED_COMMAND=$(iconv -f UTF8 -t UTF16LE <<< "$@" | base64 -)
+winsh -NoExit -EncodedCommand "$ENCODED_COMMAND"
