@@ -1,5 +1,11 @@
 # This config is meant to be included from ~/.gitconfig
 # Here's an example of how this can be done:
+# git config --global include.path ~/.config/git/gitconfig
+# git config --global include.path ~/.config/git/config.d/wsl --append
+# git config --global include.path ~/.config/git/config.d/windows --append
+# git config --global os.iswsl true
+#
+# Or manually add to ~/.gitconfig:
 #[include]
 #    path = ~/.config/git/gitconfig
 
@@ -9,12 +15,4 @@
 [include]
     path = config.d/alias.gitconfig
 
-# WSL specific global configuration because sometimes it needs to point to the Windows side of
-# things (e.g. credential manager).
-[includeif "gitdir:/"]
-    path = ~/.config/git/config.d/wsl
-
-# Windows specific global configuration.
-[includeif "gitdir:*:/"]
-    path = ~/.config/git/config.d/windows
-
+# vim:ft=gitconfig:

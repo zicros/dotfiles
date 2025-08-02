@@ -2,12 +2,13 @@
   imports = [
     ./libs
     ./base.nix
-    ./zsh.nix
-    ./tmux.nix
-    ./topydo.nix
-    ./swappy.nix
-    ./sway.nix
+    ./git.nix
     ./neovim.nix
     ./os.nix
+    ./swappy.nix
+    ./sway.nix
+    ./tmux.nix
+    ./topydo.nix
+    ./zsh.nix
   ];
 }

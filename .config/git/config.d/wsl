@@ -1,5 +1,8 @@
+# WSL specific global configuration because sometimes it needs to point to the Windows side of
+# things (e.g. credential manager).
 [credential]
     # Git automatically looks for "git-credential-$NAME"
     # https://git-scm.com/docs/gitcredentials#_custom_helpers
     helper = wslgcm
 
+# vim:ft=gitconfig:
