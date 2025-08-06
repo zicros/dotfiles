@@ -1,5 +1,7 @@
 #!/usr/bin/bash
-PACKAGES_PATH=${PACKAGES_PATH:=$HOME/.config/os/packages}
+. /etc/os-release
+
+PACKAGES_PATH=${PACKAGES_PATH:=$HOME/.config/os/${ID}_packages}
 if ! [ -f $PACKAGES_PATH ]; then
     echo "Package file doesn't exist: $PACKAGES_PATH"
     exit 0
