@@ -7,7 +7,7 @@ if ! [ -f $PACKAGES_PATH ]; then
     exit 0
 fi
 
-PACKAGES=$(cat "$PACKAGES_PATH")
+PACKAGES=$(cat "$PACKAGES_PATH" | sed "s/\s*#.*$//")
 if command -v pacman &> /dev/null; then
     # Arch install
     echo "Arch based install"
