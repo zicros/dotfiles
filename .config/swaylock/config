@@ -1,0 +1,8 @@
+color=000000
+ring-color=2222ff
+text-color=ffffff
+layout-text-color=ffffff
+show-failed-attempts
+indicator-idle-visible
+daemonize
+image=$HOME/Pictures/background.jpg

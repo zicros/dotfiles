@@ -15,6 +15,14 @@ in
         source = config.lib.file.mkOutOfStoreSymlink "${config.rz.base.path}/.config/sway/config.d";
         recursive = true;
       };
+      ".config/swaylock" = {
+        source = config.lib.file.mkOutOfStoreSymlink "${config.rz.base.path}/.config/swaylock";
+        recursive = true;
+      };
+      ".config/waybar" = {
+        source = config.lib.file.mkOutOfStoreSymlink "${config.rz.base.path}/.config/waybar";
+        recursive = true;
+      };
     };
   };
 }
