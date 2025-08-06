@@ -1,0 +1,24 @@
+#!/usr/bin/bash
+if [ "$#" -eq 0 ]; then
+    echo "Usage: $0 <KEY_ID>"
+    exit 1
+fi
+
+KEY_ID="$1"
+BACKUP_PATH="/tmp/gpg_backup"
+
+mkdir -p $BACKUP_PATH
+
+echo "Export GPG keys with id \"$KEY_ID\""
+gpg --export --armor $KEY_ID                > $BACKUP_PATH/$KEY_ID.pub.asc
+gpg --export-secret-keys --armor $KEY_ID    > $BACKUP_PATH/$KEY_ID.priv.asc
+gpg --export-secret-subkeys --armor $KEY_ID > $BACKUP_PATH/$KEY_ID.sub_priv.asc
+gpg --export-ownertrust                     > $BACKUP_PATH/ownertrust.txt
+
+echo "To import"
+echo "  gpg --import $KEY_ID.pub.asc"
+echo "  gpg --import $KEY_ID.priv.asc"
+echo "  gpg --import $KEY_ID.sub_priv.asc"
+echo "  gpg --import-ownertrust ownertrust.txt"
+
+echo "Be sure the shred files in \"$BACKUP_PATH\" with done"
