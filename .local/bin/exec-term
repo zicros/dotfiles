@@ -1,0 +1,33 @@
+#!/usr/bin/bash
+function print_usage() {
+    echo "Usage:"
+    echo "  $(basename $0) -t <TERM> -c <COMMAND>"
+}
+
+# -t and -c are required args
+OPTSTRING=":t:c:"
+while getopts "${OPTSTRING}" opt; do
+    case "${opt}" in
+        t)
+            TERM="${OPTARG}"
+            ;;
+        c)
+            CMD="${OPTARG}"
+            ;;
+        ?)
+            print_usage
+            exit 1
+            ;;
+    esac
+done
+
+if [[ "${TERM}" == "alacritty" ]]; then
+    CMD_SWITCH="--command"
+elif [[ "${TERM}" == "kitty" ]]; then
+    CMD_SWITCH="-e"
+else
+    echo "Terminal ${TERM} is not supported"
+    exit 1
+fi
+
+"${TERM}" "${CMD_SWITCH}" $CMD
