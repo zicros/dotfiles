@@ -6,7 +6,7 @@
     // Choose the order of the modules
     "modules-left": ["sway/workspaces", "sway/mode", "custom/media"],
     "modules-center": ["sway/window"],
-    "modules-right": ["pulseaudio", "network", "cpu","temperature","memory","clock","tray"],
+    "modules-right": ["pulseaudio", "network", "cpu","temperature","memory","clock","custom/idlelock","tray"],
     // Modules configuration
     // "sway/workspaces": {
     //     "disable-scroll": true,
@@ -131,5 +131,12 @@
         "escape": true,
         "exec": "$HOME/.config/waybar/mediaplayer.py 2> /dev/null" // Script in resources folder
         // "exec": "$HOME/.config/waybar/mediaplayer.py --player spotify 2> /dev/null" // Filter player based on name
+    },
+    "custom/idlelock": {
+        "format": "{text}",
+        "interval": 6,
+        "return-type": "json",
+        "max-length": 40,
+        "exec": "$HOME/.config/waybar/modules/idlelock 2> /dev/null"
     }
 }

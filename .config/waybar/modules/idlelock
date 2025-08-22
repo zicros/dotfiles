@@ -1,0 +1,17 @@
+#!/usr/bin/python
+import json
+import subprocess
+
+LOCK_ICONS = ["", ""]
+
+def main():
+    out_raw = subprocess.check_output(["ps", "-Ao", "command"])
+    processed_output = out_raw.decode("utf-8").split("\n")
+    swayidle_cmds = [cmd for cmd in processed_output if cmd.startswith("swayidle")]
+
+    print(json.dumps({
+        "text": LOCK_ICONS[len(swayidle_cmds)]
+    }), flush=True)
+
+if __name__ == "__main__":
+    main()
