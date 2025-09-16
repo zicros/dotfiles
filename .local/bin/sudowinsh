@@ -1,1 +1,2 @@
+#!/usr/bin/bash
 env --chdir="$(get_win_home)" winexec "Start-Process -Verb RunAs (Get-Process -Id $PID).ProcessName"
