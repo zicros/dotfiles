@@ -1,0 +1,129 @@
+#!/usr/bin/python
+import logging
+import tomllib
+import os
+import subprocess
+import sys
+from base64 import b64encode
+from string import Template
+
+log = logging.getLogger(__name__)
+
+def configure_logger(level=logging.INFO):
+    log.setLevel(level)
+
+    stdout_handler = logging.StreamHandler(sys.stdout)
+    formatter = logging.Formatter('%(message)s')
+    stdout_handler.setFormatter(formatter)
+
+    log.addHandler(stdout_handler)
+
+def get_configuration(path):
+    if not os.path.isfile(path):
+        log.error(f"Failed to find configuration file: {path}")
+        raise RuntimeError()
+
+    with open(path, 'rb') as config_file:
+        log.debug(f"Loading configuration toml file: {path}")
+        return tomllib.load(config_file)
+
+    if not configuration:
+        log.error(f"Failed to load configuration file: {path}")
+        raise RuntimeError()
+
+    return None
+
+def build_ps_command(template: Template):
+    for item in template:
+        log.info(item)
+    return ""
+
+class LauncherPath():
+    def __init__(self, path, filter=None, recurse=False):
+        self.path = path
+        self.filter = filter
+        self.recurse = recurse
+
+    def __repr__(self):
+        return f"{self.path}/{self.filter}, Recurse: {self.recurse}"
+
+if __name__ == "__main__":
+    configuration = get_configuration(path=os.path.expandvars('$HOME/.config/rz/winmenu.toml'))
+
+    configure_logger(level=logging.INFO)
+
+    # Powershell only allows a single filter per query, so categorize based on the filter
+    filters = {}
+
+    for k,v in configuration['paths'].items():
+        filter = v['filter'] if 'filter' in v else '*'
+        is_recursive = v['recurse'] if 'recurse' in v else False
+
+        launcher_path = LauncherPath(path=v['path'], filter=filter, recurse=is_recursive)
+
+        if filter not in filters:
+            filters[filter] = []
+
+        filters[filter].append(launcher_path)
+
+    processed_launcher_paths = []
+
+    # Break apart the recursive and non-recursive cases.
+    for filter,paths in filters.items():
+        recursive_paths = [path for path in paths if path.recurse]
+        if len(recursive_paths) > 0:
+            processed_launcher_paths.append({
+                'filter': filter,
+                'recursive': True,
+                'paths': recursive_paths
+            })
+
+        non_recursive_paths = [path for path in paths if not path.recurse]
+        if len(non_recursive_paths) > 0:
+            processed_launcher_paths.append({
+                'filter': filter,
+                'recursive': False,
+                'paths': non_recursive_paths
+            })
+
+    log.debug(processed_launcher_paths)
+
+    ps_commands = []
+
+    ps_command_template = Template('Get-ChildItem -Path @($paths) -Filter "$filter" -Recurse:$is_recursive')
+    for processed_paths in processed_launcher_paths:
+        cmd = ps_command_template.substitute({
+            'paths': ",".join([f'"{path.path}"' for path in processed_paths['paths']]),
+            'filter': processed_paths['filter'],
+            'is_recursive': "$True" if processed_paths['recursive'] else "$False"
+            })
+        log.debug(cmd)
+
+        ps_commands.append(cmd)
+
+
+    full_ps_command = f"({'+'.join([f"({cmd})" for cmd in ps_commands])}) | % FullName"
+    log.debug(f"Full command\n{full_ps_command}")
+
+    # Powershell -EncodedCommand expects utf-16-le
+    encoded_command = b64encode(full_ps_command.encode('utf-16-le')).decode('utf-8')
+    log.debug(encoded_command)
+
+    all_files_proc = subprocess.Popen(
+        ['winsh', '-NoProfile', '-NoLogo', '-NonInteractive', '-EncodedCommand', encoded_command],
+        stdout=subprocess.PIPE)
+
+    fzf_proc = subprocess.run(
+        ('fzf',
+        '-0',
+        '--bind', 'enter:become(winexec Start-Process "{}")',
+        '--delimiter', '\\',
+        '--with-nth', '-1',
+        '--prompt', "Launch> ",
+         '--tmux', 'center,25%,10%'
+         ),
+        stdin=all_files_proc.stdout,
+        stdout=subprocess.PIPE)
+
+    if fzf_proc.returncode != 0:
+        sys.exit(1)
