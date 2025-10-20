@@ -120,8 +120,7 @@ if __name__ == "__main__":
         '--delimiter', '\\',
         '--with-nth', '-1',
         '--prompt', "Launch> ",
-         '--tmux', 'center,25%,10%'
-         ),
+        '--tmux', 'center,50%,20%'),
         stdin=all_files_proc.stdout,
         stdout=subprocess.PIPE)
 
