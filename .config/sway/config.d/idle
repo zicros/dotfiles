@@ -10,16 +10,24 @@
 # This will lock your screen after 300 seconds of inactivity, then turn off
 # your displays after another 300 seconds, and turn your screens back on when
 # resumed. It will also lock your screen before your computer goes to sleep.
+exec (killall swayidle || true) && swayidle -w \
+    timeout 300 'swaylock -f' \
+    timeout 360 'swaymsg "output * power off"' \
+        resume 'swaymsg "output * power on"' \
+    before-sleep 'swaylock -f'
+
 bindsym $mod+Delete exec (killall swayidle || true) && swayidle -w \
-    timeout 300 'swaylock' \
-    timeout 360 'swaymsg "output * power off"' resume 'swaymsg "output * power on"' \
-    before-sleep 'swaylock'
+    timeout 300 'swaylock -f' \
+    timeout 360 'swaymsg "output * power off"' \
+        resume 'swaymsg "output * power on"' \
+    before-sleep 'swaylock -f'
 
 bindsym $mod+Shift+Delete exec killall swayidle
 
+# Use the following command to help debug which windows are inhibiting idle.
+# swaymsg -t get_tree -r | jq '.. | objects | select(has("inhibit_idle")) | {name, inhibit_idle}'
 for_window {
     [app_id="firefox"] inhibit_idle fullscreen
-    [class="firefox"] inhibit_idle fullscreen
 }
 
 # vim:ft=swayconfig:
