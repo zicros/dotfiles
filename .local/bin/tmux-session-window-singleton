@@ -165,17 +165,15 @@ class Tmux():
 
         return True
 
-    def new_session(session_name, window_name, pane):
-        proc = subprocess.run(
-            'tmux new-session -d -s "{0}" -n "{1}" -PF "#{{session_id}}" {2}'.format(
-                session_name,
-                window_name,
-                pane),
-            shell=True,
-            capture_output=True)
+    def new_session(session_name, window_name, pane, environment):
+        cmd = ['tmux', 'new-session', '-d', '-s', session_name, '-n', window_name, '-PF', '#{session_id}']
+        for env in environment:
+            cmd += ["-e", f"{env}"]
+        cmd += [pane]
+
+        proc = subprocess.run(cmd, capture_output=True)
         if proc.returncode != 0:
             raise BaseException(proc.stderr)
-
 
         session = TmuxSession(session_id = proc.stdout.decode("utf-8").strip())
         return session
@@ -193,6 +191,7 @@ def run(args):
     session_name = args.session
     desired_panes = args.pane
     window_name = args.window
+    environment = args.environment if args.environment is not None else ""
 
     target_window = None
 
@@ -200,7 +199,7 @@ def run(args):
     sessions = [session for session in Tmux.get_sessions() if session.get_name() == session_name]
     if len(sessions) == 0:
         print("Creating new session: {0}".format(session_name))
-        session = Tmux.new_session(session_name = session_name, window_name = window_name, pane = desired_panes[0])
+        session = Tmux.new_session(session_name = session_name, window_name = window_name, pane = desired_panes[0], environment = environment)
     elif len(sessions) == 1:
         session = sessions[0]
     else:
@@ -221,14 +220,16 @@ def run(args):
     panes = [window.split_window(pane = pane) for pane in nonexistent_panes]
     print("Created", panes)
 
-    # Switch to it after everything is done
-    window.switch_to()
-
+    if not args.detach:
+        # Switch to it after everything is done
+        window.switch_to()
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Allows creation singleton style windows')
     parser.add_argument('-s', '--session', required=True)
     parser.add_argument('-w', '--window', required=True)
     parser.add_argument('-p', '--pane', required=True, nargs='+')
+    parser.add_argument('-e', '--environment', nargs='*')
+    parser.add_argument('-d', '--detach', action="store_true")
 
     run(args = parser.parse_args())
