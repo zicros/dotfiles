@@ -15,7 +15,7 @@ if [[ $TMUX && $# == 0 ]]; then
 fi
 
 if [[ $# == 0 ]]; then
-    $EXE -NoExit -Command "cd"
+    $EXE -NoExit
 else
     $EXE "$@"
 fi
