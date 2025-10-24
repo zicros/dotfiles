@@ -15,7 +15,12 @@ if [[ $TMUX && $# == 0 ]]; then
 fi
 
 if [[ $# == 0 ]]; then
-    $EXE -NoExit
+    PWSH_WORKING_DIR="$(wslpath -m ${PWD})"
+    if rg "^//wsl.localhost/" <<< "$PWSH_WORKING_DIR" > /dev/null; then
+        PWSH_WORKING_DIR="$(wslpath -m ${WIN_HOME})"
+    fi
+
+    $EXE -NoLogo -NoExit -WorkingDirectory "${PWSH_WORKING_DIR}"
 else
     $EXE "$@"
 fi
