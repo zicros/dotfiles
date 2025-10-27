@@ -14,13 +14,16 @@ if [[ $TMUX && $# == 0 ]]; then
     tmux rename-window -t $TMUX_TARGET $SCRIPT_NAME
 fi
 
-if [[ $# == 0 ]]; then
-    PWSH_WORKING_DIR="$(wslpath -m ${PWD})"
-    if rg "^//wsl.localhost/" <<< "$PWSH_WORKING_DIR" > /dev/null; then
-        PWSH_WORKING_DIR="$(wslpath -m ${WIN_HOME})"
-    fi
+# Figure out the working directory so we're not using a //wsl.localhost path.
+PWSH_WORKING_DIR="$(wslpath -m ${PWD})"
+if rg "^//wsl.localhost/" <<< "$PWSH_WORKING_DIR" > /dev/null; then
+    PWSH_WORKING_DIR="$(wslpath -m ${WIN_HOME})"
+fi
 
+if [[ $# == 0 ]]; then
     $EXE -NoLogo -NoExit -WorkingDirectory "${PWSH_WORKING_DIR}"
 else
-    $EXE "$@"
+    # If the caller sets the working directory again, it'll override what we put here so it's safe
+    # to set the working directory.
+    $EXE -WorkingDirectory "${PWSH_WORKING_DIR}" "$@"
 fi
