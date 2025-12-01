@@ -4,7 +4,7 @@ NOTES_PATH=$(get-path.py notes)
 if is_wsl; then
     # Use native to speed up file access.
     WIN_NOTES_PATH=$(wslpath -m "$NOTES_PATH")
-    CMD='winexec "ls \"$WIN_NOTES_PATH\" -Filter 2*.md -File | Get-Content -TotalCount 1"'
+    CMD='winexec "ls \"$WIN_NOTES_PATH\" -Filter 2*.md -File | % { \$stream = [System.IO.StreamReader]::new(\$_.FullName); \$stream.ReadLine(); \$stream.Close() }"'
 else
     CMD='find "${NOTES_PATH}" -type f -name "2*.md" -exec head "-qn 1" "{}" +'
 fi
