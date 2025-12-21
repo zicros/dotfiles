@@ -12,22 +12,22 @@ Generally speaking, to bootstrap:
 For Linux:
 
 ```bash
-DOTFILES_PATH=$HOME/.dotfiles
+DOTFILES_PATH=$HOME/git/dotfiles
 mkdir -p "$DOTFILES_PATH"
-alias config='/usr/bin/git --git-dir=$DOTFILES_PATH/personal --work-tree=$HOME'
+alias config='/usr/bin/git --git-dir=$DOTFILES_PATH --work-tree=$HOME'
 ```
 
 For Windows:
 
 ```powershell
-$DOTFILES_PATH = Join-Path $HOME ".dotfiles"
+$DOTFILES_PATH = Join-Path $HOME "git/dotfiles"
 $null = mkdir -Force "$DOTFILES_PATH"
-function config() { git --git-dir="$DOTFILES_PATH/personal" --work-tree=$HOME @args }
+function config() { git --git-dir="$DOTFILES_PATH" --work-tree=$HOME @args }
 ```
 2. Clone the repo and restore the files
 
 ```bash
-git clone --bare <REPO> "$DOTFILES_PATH/personal"
+git clone --bare <REPO> "$DOTFILES_PATH"
 config config status.showUntrackedFiles no
 config restore --staged $HOME && config restore $HOME
 ```
