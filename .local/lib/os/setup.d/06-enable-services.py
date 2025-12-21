@@ -10,11 +10,15 @@ with open(os.path.expandvars('/etc/os-release'), 'r') as os_file:
         key, value = line.split('=', 1)
         os_config[key] = value.strip('\n "')
 
-with open(os.path.expandvars(f'$HOME/.config/os/services'), 'rb') as config_file:
-    config = tomllib.load(config_file)
+try:
+    with open(os.path.expandvars(f'$HOME/.config/os/services'), 'rb') as config_file:
+        config = tomllib.load(config_file)
+except FileNotFoundError:
+    print("No services configuration file, skipping...")
+    sys.exit(0)
 
 os_id = os_config['ID']
-if os_id == 'arch':
+if os_id == 'arch' or os_id == 'ubuntu':
     system_services = [service_name for service_name,service_config in config[os_id]['system_services'].items() if service_config['enable']]
     user_services = [service_name for service_name,service_config in config[os_id]['user_services'].items() if service_config['enable']]
 
