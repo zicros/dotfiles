@@ -2,15 +2,62 @@
 import json
 import subprocess
 
-LOCK_ICONS = ["", ""]
+LOCK_ICON_IDLE_LOCK_ENABLED = ""
+LOCK_ICON_IDLE_LOCK_DISABLED = ""
+LOCK_ICON_IDLE_LOCK_BLOCKED = ""
+
+class SwayWindow:
+    def __init__(self, data):
+        self.__data = data
+
+    def get_name(self):
+        return self.__data["name"]
+
+    def is_inhibiting_idle(self):
+        return "inhibit_idle" in self.__data and self.__data["inhibit_idle"]
+
+class SwayWorkspace:
+    def __init__(self, data):
+        self.__data = data
+
+    def get_windows(self):
+        return [SwayWindow(window) for window in self.__data["nodes"]]
+
+class SwayOutput:
+    def __init__(self, data):
+        self.__data = data
+
+    def get_workspaces(self):
+        return [SwayWorkspace(workspace) for workspace in self.__data["nodes"]]
+
+
+def is_app_blocking_idle():
+    output = subprocess.check_output(["swaymsg", "-t", "get_tree", "-r"])
+    json_output = json.loads(output)
+
+    outputs = [SwayOutput(output) for output in json_output["nodes"]]
+    workspaces = [workspace for output in outputs for workspace in output.get_workspaces()]
+    windows = [window for workspace in workspaces for window in workspace.get_windows()]
+
+    for window in windows:
+        if window.is_inhibiting_idle():
+            return True
+    return False
+
 
 def main():
     out_raw = subprocess.check_output(["ps", "-Ao", "command"])
     processed_output = out_raw.decode("utf-8").split("\n")
     swayidle_cmds = [cmd for cmd in processed_output if cmd.startswith("swayidle")]
+    if len(swayidle_cmds) == 0:
+        text = LOCK_ICON_IDLE_LOCK_DISABLED
+    elif is_app_blocking_idle():
+        text = LOCK_ICON_IDLE_LOCK_BLOCKED
+    else:
+        text = LOCK_ICON_IDLE_LOCK_ENABLED
 
     print(json.dumps({
-        "text": LOCK_ICONS[len(swayidle_cmds)]
+        "text": text
     }), flush=True)
 
 if __name__ == "__main__":

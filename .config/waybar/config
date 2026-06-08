@@ -26,6 +26,10 @@
     "sway/mode": {
         "format": "<span style=\"italic\">{}</span>"
     },
+    "sway/window": {
+        "format": "{}",
+        "max-length": 35
+    },
     "mpd": {
         "format": "{stateIcon} {consumeIcon}{randomIcon}{repeatIcon}{singleIcon}{artist} - {album} - {title} ({elapsedTime:%M:%S}/{totalTime:%M:%S}) ⸨{songPosition}|{queueLength}⸩ ",
         "format-disconnected": "Disconnected ",
@@ -134,9 +138,10 @@
     },
     "custom/idlelock": {
         "format": "{text}",
-        "interval": 6,
+        "interval": 2,
         "return-type": "json",
         "max-length": 40,
         "exec": "$HOME/.config/waybar/modules/idlelock 2> /dev/null"
     }
 }
+// vim:ft=json:
