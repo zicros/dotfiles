@@ -137,3 +137,12 @@ in
 
 # vim:ts=2:sw=2:expandtab:
 ```
+
+# Development
+
+For local edits, you can simply update the flake that we modify locally. If you don't specify the
+specific flake, everything will be updated.
+
+```bash
+nix flake update --flake $HOME/.config/home-manager/ rzbase rzneovim
+```
