@@ -20,7 +20,7 @@ with open(os.path.expandvars(f'$HOME/.config/os/packages'), 'rb') as config_file
 os_id = os_config['ID']
 if os_id == 'arch':
     if command_exists('pacman'):
-        cmd = ' '.join(['sudo', 'pacman', '--noconfirm', '-S'] + config[os_id]['packages'])
+        cmd = ' '.join(['sudo', 'pacman', '--noconfirm', '-Syu'] + config[os_id]['packages'])
         subprocess.run(cmd, shell=True)
 
     if command_exists('yay') and ('aur_packages' in config[os_id]) and (len(config[os_id]['aur_packages']) > 0):

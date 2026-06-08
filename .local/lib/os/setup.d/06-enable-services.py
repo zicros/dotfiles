@@ -18,9 +18,11 @@ except FileNotFoundError:
     sys.exit(0)
 
 os_id = os_config['ID']
-if os_id == 'arch' or os_id == 'ubuntu':
-    system_services = [service_name for service_name,service_config in config[os_id]['system_services'].items() if service_config['enable']]
-    user_services = [service_name for service_name,service_config in config[os_id]['user_services'].items() if service_config['enable']]
+if os_id == 'arch':
+    system_services = [f"{service_name}.service" for service_name,service_config in config[os_id]['system_services'].items() if service_config['enable']]
+    user_services = [service_name + (".timer" if service_config.get("timer") else ".service")
+                     for service_name,service_config in config[os_id]['user_services'].items()
+                     if service_config['enable']]
 
     if len(system_services) > 0:
         cmd = ' '.join(['sudo', 'systemctl', 'enable'] + system_services)
