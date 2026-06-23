@@ -1,3 +1,5 @@
-local terminal = "alacritty"
-
-bind("SUPER", "Return", "exec, " .. terminal)
+require("autostart")
+require("monitors")
+require("look_and_feel")
+require("window_management")
+require("shortcuts")

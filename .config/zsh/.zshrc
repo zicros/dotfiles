@@ -38,7 +38,7 @@ if [ -z "$WAYLAND_DISPLAY" ] && [ -n "$XDG_VTNR" ] && [ "$XDG_VTNR" -eq 1 ] ; th
     # Universal Wayland Session Manager
     if command -v uwsm > /dev/null; then
         if uwsm check may-start; then
-            exec uwsm start sway.desktop
+            exec uwsm start hyprland-uwsm.desktop
         fi
     else
         exec sway
