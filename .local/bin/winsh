@@ -21,9 +21,9 @@ if rg "^//wsl.localhost/" <<< "$PWSH_WORKING_DIR" > /dev/null; then
 fi
 
 if [[ $# == 0 ]]; then
-    $EXE -NoLogo -NoExit -WorkingDirectory "${PWSH_WORKING_DIR}"
+    exec $EXE -NoLogo -NoExit -WorkingDirectory "${PWSH_WORKING_DIR}"
 else
     # If the caller sets the working directory again, it'll override what we put here so it's safe
     # to set the working directory.
-    $EXE -WorkingDirectory "${PWSH_WORKING_DIR}" "$@"
+    exec $EXE -WorkingDirectory "${PWSH_WORKING_DIR}" "$@"
 fi
