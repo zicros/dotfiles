@@ -6,7 +6,7 @@
     // Choose the order of the modules
     "modules-left": ["hyprland/workspaces", "hyprland/mode", "custom/media"],
     "modules-center": ["hyprland/window"],
-    "modules-right": ["pulseaudio", "network", "cpu","temperature","memory","clock","custom/idlelock","tray"],
+    "modules-right": ["pulseaudio", "network", "cpu","temperature","memory","clock","idle_inhibitor","tray"],
     // Modules configuration
     // "hyprland/workspaces": {
     //     "disable-scroll": true,
@@ -61,7 +61,10 @@
         "format-icons": {
             "activated": "",
             "deactivated": ""
-        }
+        },
+        "tooltip": true,
+        "tooltip-format-activated": "Idle Inhibited",
+        "tooltip-format-deactivated": "Idle Enabled"
     },
     "tray": {
         // "icon-size": 21,

@@ -19,3 +19,8 @@ end
 
 hl.animation({ leaf = "fade", enabled = false, })
 hl.animation({ leaf = "windows", enabled = false, })
+
+hl.on("hyprland.start", function()
+    hl.exec_cmd("swaybg -i $HOME/Pictures/background.jpg -m fill")
+end)
+
