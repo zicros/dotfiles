@@ -1,0 +1,11 @@
+# ~/.config/systemd/user/tmux.service
+[Unit]
+Description=Persistent tmux
+
+[Service]
+Type=forking
+ExecStart=/usr/bin/tmux new-session -d -s %i
+RemainAfterExit=yes
+
+[Install]
+WantedBy=default.target
