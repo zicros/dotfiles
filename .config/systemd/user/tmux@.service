@@ -6,6 +6,7 @@ Description=Persistent tmux
 Type=forking
 ExecStart=/usr/bin/tmux new-session -d -s %i
 RemainAfterExit=yes
+EnvironmentFile=%h/.local/state/user.env
 
 [Install]
 WantedBy=default.target
