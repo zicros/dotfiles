@@ -1,0 +1,71 @@
+#!/usr/bin/bash
+SYSTEMD_WINSH_PID_PATH=$(winsh -Command '("$HOME/.local/state/winsh_{0}.pid" -f (Get-Random)) -replace "\\","/"')
+
+usage() {
+    echo "Usage: $0 [-h] -- <powershell command>"
+}
+
+cleanup() {
+    systemd-notify --status="Terminating child processes ($PWSH_PID)"
+
+    echo "Terminating the task tree"
+    # Terminating the parent doesn't automatically terminate the children in Windows.
+    winexec "taskkill /F /T /PID $PWSH_PID"
+    winexec "Remove-Item $SYSTEMD_WINSH_PID_PATH"
+    exit 0
+}
+
+get_winsh_output() {
+    local winsh_pid="$1"
+    local regex="$2"
+
+    local additional_args=()
+    if ! [[ "$regex" == "" ]]; then
+        additional_args+=("-g" "$regex")
+    fi
+
+    env -u NOTIFY_SOCKET journalctl --since=today --no-pager "_PID=$winsh_pid" "${args[@]}"
+}
+
+while getopts ":h" opt; do
+    case "${opt}" in
+        h)
+            usage
+            exit 1
+            ;;
+        *)
+            usage
+            exit 1
+            ;;
+    esac
+done
+
+shift $((OPTIND - 1))
+
+PWSH_COMMAND_ARGS="$@"
+STATUS_READY_REGEX="===>START"
+STATUS_FAIL_REGEX="===>STOP"
+
+trap cleanup SIGTERM
+
+winsh -Command "try { echo \$PID > $SYSTEMD_WINSH_PID_PATH; echo PID:\$PID; echo ===>START; $PWSH_COMMAND_ARGS } finally {echo ===>STOP}" &
+CHILD_PID=$!
+
+# Wait until we're certain we're done connecting before notifying systemd.
+# Unset NOTIFY_SOCKET because journalctl will mark the service as ready otherwise.
+while ! get_winsh_output $CHILD_PID 2>&1 | rg -ie "$STATUS_READY_REGEX" > /dev/null; do
+#while ! env -u NOTIFY_SOCKET journalctl --since=today --no-pager "_PID=$CHILD_PID" -g "$STATUS_READY_REGEX" 2>&1 > /dev/null; do
+    sleep 1
+done
+
+PWSH_PID="$(get_winsh_output $CHILD_PID | rg -o "PID:\d+" | cut -d : -f 2)"
+
+systemd-notify --ready --status="PWSH PID($PWSH_PID)"
+
+# Monitor for failures. See above for why NOTIFY_SOCKET is unset.
+#while ! env -u NOTIFY_SOCKET journalctl --since=today --no-pager "_PID=$CHILD_PID" -g "$STATUS_FAIL_REGEX" 2>&1 > /dev/null; do
+while ! get_winsh_output $CHILD_PID 2>&1 | rg -ie "$STATUS_FAIL_REGEX" > /dev/null; do
+    sleep 5
+done
+
+cleanup
