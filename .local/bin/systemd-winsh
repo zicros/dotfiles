@@ -2,7 +2,7 @@
 SYSTEMD_WINSH_PID_PATH=$(winsh -Command "\"\$HOME/.local/state/winsh_$$.pid\" -replace '\\\\','/'")
 
 usage() {
-    echo "Usage: $0 [-h] -- <powershell command>"
+    echo "Usage: $0 [-h] [-r status_ready_regex] [-f status_fail_regex] -- <powershell command>"
 }
 
 cleanup() {
@@ -27,11 +27,20 @@ get_winsh_output() {
     env -u NOTIFY_SOCKET journalctl --since=today --no-pager "_PID=$winsh_pid" "${args[@]}"
 }
 
-while getopts ":h" opt; do
+STATUS_READY_REGEX="===>START"
+STATUS_FAIL_REGEX="===>STOP"
+
+while getopts ":hr:f:" opt; do
     case "${opt}" in
         h)
             usage
-            exit 1
+            exit 0
+            ;;
+        r)
+            STATUS_READY_REGEX="$OPTARG"
+            ;;
+        f)
+            STATUS_FAIL_REGEX="$OPTARG"
             ;;
         *)
             usage
@@ -43,8 +52,6 @@ done
 shift $((OPTIND - 1))
 
 PWSH_COMMAND_ARGS="$@"
-STATUS_READY_REGEX="===>START"
-STATUS_FAIL_REGEX="===>STOP"
 
 trap cleanup SIGTERM
 
