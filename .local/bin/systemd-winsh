@@ -1,5 +1,5 @@
 #!/usr/bin/bash
-SYSTEMD_WINSH_PID_PATH=$(winsh -Command '("$HOME/.local/state/winsh_{0}.pid" -f (Get-Random)) -replace "\\","/"')
+SYSTEMD_WINSH_PID_PATH=$(winsh -Command "\"\$HOME/.local/state/winsh_$$.pid\" -replace '\\\\','/'")
 
 usage() {
     echo "Usage: $0 [-h] -- <powershell command>"
